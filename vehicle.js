@@ -2,7 +2,7 @@ var mr = 0.01; // mutation rate - 1%の確率でdnaを変化
 
 function Vehicle(x, y, dna) {
   this.acceleration = createVector(0, 0); // 加速
-  this.velocity = createVector(0, -2); // 速さ
+  this.velocity = createVector(0, -2); // 速さ(向かう強さ)
   this.position = createVector(x, y); // 場所
   this.r = 6; // vehicleの大きさ
   this.maxspeed = 3;
@@ -100,8 +100,10 @@ function Vehicle(x, y, dna) {
    * EAT Func
    **/
   this.eat = function(list, nutrition, perception) {
-    var record = Infinity;
-    var closest = null;
+    var record = Infinity; // 最も近いアイテムへの距離
+    var closest = null; // 最も近いアイテム
+
+    // food/poison arrray を 逆for loop で確認 (エラー回避のため)
     for (var i = list.length - 1; i >= 0; i--) {
       // d = vehicleからfood/positionの距離(distance)
       var d = this.position.dist(list[i]);
@@ -111,6 +113,9 @@ function Vehicle(x, y, dna) {
         list.splice(i, 1); // food/poisonを消す(eatする)
         this.health += nutrition; // food/poison値がhealthの増減に影響
       } else {
+        // 現アイテムのdistanceがrecord(現在記録されている最も近いアイテム)より小さくて
+        // かつperceptionの範囲内であった場合 recordを更新
+        // closestにそのアイテムを保存
         if (d < record && d < perception) {
           record = d;
           closest = list[i];
@@ -118,8 +123,8 @@ function Vehicle(x, y, dna) {
       }
     }
 
-    // This is the moment of eating
     if (closest != null) {
+      // closestをseekする
       return this.seek(closest);
     }
 
